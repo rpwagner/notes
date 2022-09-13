@@ -6,7 +6,7 @@
 
 https://rpwagner.github.io/notes/
 
-# My Blog
+# Some Notes
 
 
 _powered by [fastpages](https://github.com/fastai/fastpages)_
