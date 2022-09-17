@@ -81,8 +81,15 @@ and checking the key `'https_server'`
 collection_info = tc.get_endpoint(collection_id)
 base_url = collection_info['https_server']
 ```
-
 In this case a slash `/` will be prepended to the path if needed.
+
+```shell
+$ ./globuscollectionput.py -v science.json https://example.edu/data/ \
+	6528bad5-bc02-497d-8a4f-a38547d0e72a
+Filename: science.json
+Destination: https://example.edu/data/science.json
+PUT to https://example.edu/data/science.json status 200
+```
 
 ## Destination: File or Folder
 
@@ -155,8 +162,18 @@ either case, the client's identity will be
 ```
 <client_id>@clients.auth.globus.org
 ```
-
 Where `<client_id>` is the UUID of the client.
+
+Example
+```shell
+$ ./globuscollectionput.py -v -c /etc/secret-sauce.json \
+	science.json https://example.edu/data/ \
+	6528bad5-bc02-497d-8a4f-a38547d0e72a
+Using Confidential Client
+Filename: science.json
+Destination: https://example.edu/data/science.json
+PUT to https://example.edu/data/science.json status 200
+```
 
 ## Great, What About `GET`, `DELETE`, `OPTIONS`, and `HEAD`?
 
