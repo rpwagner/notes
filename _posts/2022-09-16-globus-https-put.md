@@ -1,3 +1,11 @@
+---
+ toc: true
+ layout: post
+ description: A script to do HTTPS uploads to a Globus collection.
+ categories: [globus, script, python]
+ title: Globus HTTPS PUT
+ ---
+ 
 # Globus HTTPS `PUT`
 
 The script [`globuscollectionput.py`](../scripts/globuscollectionput.py) uses
