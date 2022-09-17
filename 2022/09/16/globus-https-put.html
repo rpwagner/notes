@@ -202,8 +202,14 @@ and checking the key <code class="language-plaintext highlighter-rouge">'https_s
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">collection_info</span> <span class="o">=</span> <span class="n">tc</span><span class="p">.</span><span class="n">get_endpoint</span><span class="p">(</span><span class="n">collection_id</span><span class="p">)</span>
 <span class="n">base_url</span> <span class="o">=</span> <span class="n">collection_info</span><span class="p">[</span><span class="s">'https_server'</span><span class="p">]</span>
 </code></pre></div></div>
-
 <p>In this case a slash <code class="language-plaintext highlighter-rouge">/</code> will be prepended to the path if needed.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./globuscollectionput.py <span class="nt">-v</span> science.json https://example.edu/data/ <span class="se">\</span>
+	6528bad5-bc02-497d-8a4f-a38547d0e72a
+Filename: science.json
+Destination: https://example.edu/data/science.json
+PUT to https://example.edu/data/science.json status 200
+</code></pre></div></div>
 
 <h2 id="destination-file-or-folder">
 <a class="anchor" href="#destination-file-or-folder" aria-hidden="true"><span class="octicon octicon-link"></span></a>Destination: File or Folder</h2>
@@ -325,8 +331,17 @@ or by giving the client access to a folder in a guest collection. In
 either case, the client’s identity will be</p>
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;client_id&gt;@clients.auth.globus.org
 </code></pre></div></div>
-
 <p>Where <code class="language-plaintext highlighter-rouge">&lt;client_id&gt;</code> is the UUID of the client.</p>
+
+<p>Example</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./globuscollectionput.py <span class="nt">-v</span> <span class="nt">-c</span> /etc/secret-sauce.json <span class="se">\</span>
+	science.json https://example.edu/data/ <span class="se">\</span>
+	6528bad5-bc02-497d-8a4f-a38547d0e72a
+Using Confidential Client
+Filename: science.json
+Destination: https://example.edu/data/science.json
+PUT to https://example.edu/data/science.json status 200
+</code></pre></div></div>
 
 <h2 id="great-what-about-get-delete-options-and-head">
 <a class="anchor" href="#great-what-about-get-delete-options-and-head" aria-hidden="true"><span class="octicon octicon-link"></span></a>Great, What About <code class="language-plaintext highlighter-rouge">GET</code>, <code class="language-plaintext highlighter-rouge">DELETE</code>, <code class="language-plaintext highlighter-rouge">OPTIONS</code>, and <code class="language-plaintext highlighter-rouge">HEAD</code>?</h2>
