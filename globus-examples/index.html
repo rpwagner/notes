@@ -4,20 +4,20 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.8.0 -->
-<title>About Me | Rick Wagner: Notes</title>
+<title>Globus Examples | Rick Wagner: Notes</title>
 <meta name="generator" content="Jekyll v4.1.1" />
-<meta property="og:title" content="About Me" />
+<meta property="og:title" content="Globus Examples" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Just a space to share some content." />
 <meta property="og:description" content="Just a space to share some content." />
-<link rel="canonical" href="https://rpwagner.github.io/notes/about/" />
-<meta property="og:url" content="https://rpwagner.github.io/notes/about/" />
+<link rel="canonical" href="https://rpwagner.github.io/notes/globus-examples/" />
+<meta property="og:url" content="https://rpwagner.github.io/notes/globus-examples/" />
 <meta property="og:site_name" content="Rick Wagner: Notes" />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="About Me" />
+<meta property="twitter:title" content="Globus Examples" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebSite","description":"Just a space to share some content.","headline":"About Me","name":"Rick Wagner: Notes","url":"https://rpwagner.github.io/notes/about/"}</script>
+{"@context":"https://schema.org","@type":"WebPage","description":"Just a space to share some content.","headline":"Globus Examples","url":"https://rpwagner.github.io/notes/globus-examples/"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/notes/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://rpwagner.github.io/notes/feed.xml" title="Rick Wagner: Notes" /><link rel="icon" type="image/png" href="/notes/images/favicon.png"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
@@ -85,26 +85,82 @@ window.onload = wrap_img;
 </header>
 <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <article class="post">
+        <h1 id="globus-examples">Globus Examples</h1>
 
-  <header class="post-header">
-    <h1 class="post-title">About Me</h1>
-  </header>
+<h2 id="premise-and-intentions">Premise and Intentions</h2>
 
-  <div class="post-content">
-    <p>This website is powered by <strong><a href="https://github.com/fastai/fastpages">fastpages</a></strong> <sup id="fnref:1" role="doc-noteref"><a href="#fn:1" class="footnote" rel="footnote">1</a></sup>.</p>
+<p>This was also posted an <a href="https://github.com/globus/globus-cli/issues/679">issue on the Globus CLI
+repo</a> to get feedback
+from the Globus developers. This goes back to a conversation that
+happened while I was part of the Globus team when we created the
+<a href="https://github.com/globus/automation-examples">automation examples</a>
+repository, about how to handle community contributions.</p>
 
-<div class="footnotes" role="doc-endnotes">
-  <ol>
-    <li id="fn:1" role="doc-endnote">
-      <p>a blogging platform that natively supports Jupyter notebooks in addition to other formats. <a href="#fnref:1" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
-    </li>
-  </ol>
-</div>
+<p>My intention is to post a few (maybe several) end-to-end examples of
+how to do things for various use cases–when everything is mostly
+working. I.e., useful demo, teaching, and sys admin script
+references. These are coming from my work with projects at UCSD, and
+sharing them publicly is the best way for folks on campus to find them.</p>
 
-  </div>
+<p>The examples largely build on the Globus Python SDK and use the
+command line so that it’s easy for someone to both read and run
+them. Which is why I reached out to the Globus team, because I’m
+certain there’s a ridiculously long wish list for the Globus SDK and
+CLI that include some of the things I’ll be covering. And I fully appreciate
+the difference between me putting out script with poor error
+handling that avoids edge cases compared to what the supported
+releases need to achieve.</p>
 
-</article>
+<p>With that framing, here are my intentions as I put these out in the
+world.</p>
+
+<h3 id="vulnerabilities">Vulnerabilities</h3>
+
+<p>If you see something egregiously wrong, particularly regarding the
+handling of tokens, permissions, roles, etc., please let me know. I
+don’t expect anyone to vet or review these examples, but I will take
+seriously any reports of a potential risk to someone using them.</p>
+
+<h3 id="deprecating-examples">Deprecating Examples</h3>
+
+<p>When the CLI or some other supported tool from Globus add the same
+functionality, I’ll update my examples to reference it, or even remove
+the example. This is the part about the SDK and CLI roadmap. I know
+some of these things will be coming; for now, plese treat the examples
+as a way for the Globus community to adopt Globus product features as
+those features go from the API, to the SDK, to the CLI.</p>
+
+<h3 id="please-reuse-or-take-inspiration">Please Reuse or Take Inspiration</h3>
+
+<p>If anything in an example looks useful, please feel free to reuse it,
+I would be honored. Realistically, you’re not going to find the actual
+code useful, but maybe a feature will be worth implementing. For
+example, I think the abiltity to <a href="https://rpwagner.github.io/notes/2022/09/16/globus-https-put.html#confidential-client">pass the client ID and secret via a
+file</a>
+is a good addition to <a href="https://docs.globus.org/cli/environment_variables/#client_credentials_with_globus_cli_client_id">using environment
+variables</a>. I’ve
+started looking at the Globus CLI code to see how to add the option
+through a pull request, so we’ll see if I can <a href="https://github.com/globus/globus-cli/blob/main/CONTRIBUTING.adoc">contribute
+directly</a>.</p>
+
+<p>Likewise, I’d be glad to see these included in training materials,
+blog posts, or other sharing if it’s worthwhile from your
+perspective. However, to my comment about about where to host these, I
+chose not to do a pull request to the automation examples repo or
+elsewhere. I think it’s better to see if how the Globus user community
+responds to the examples and if it results in a Globus- or
+community-managed space for contributions.</p>
+
+<h2 id="thanks">Thanks</h2>
+
+<p>Finally, thanks to the Globus on everything that makes these possible.</p>
+
+<h2 id="list-of-examples">List of Examples</h2>
+
+<ul>
+  <li>HTTPS PUT <a href="https://rpwagner.github.io/notes/2022/09/16/globus-https-put.html">Description</a>, <a href="https://github.com/rpwagner/serverless-data/blob/main/bin/globuscollectionput.py">Script</a></li>
+</ul>
+
 
       </div>
     </main><footer class="site-footer h-card">
