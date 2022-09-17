@@ -119,7 +119,7 @@ window.onload = wrap_img;
 <li class="toc-entry toc-h3"><a href="#confidential-client">Confidential Client</a></li>
 </ul>
 </li>
-<li class="toc-entry toc-h2"><a href="#great-what-about-get-delete-and-head">Great, What About GET, DELETE, and HEAD?</a></li>
+<li class="toc-entry toc-h2"><a href="#great-what-about-get-delete-options-and-head">Great, What About GET, DELETE, OPTIONS, and HEAD?</a></li>
 <li class="toc-entry toc-h2"><a href="#getting-help">Getting Help</a></li>
 </ul>
 </li>
@@ -127,14 +127,17 @@ window.onload = wrap_img;
 <a class="anchor" href="#globus-https-put" aria-hidden="true"><span class="octicon octicon-link"></span></a>Globus HTTPS <code class="language-plaintext highlighter-rouge">PUT</code>
 </h1>
 
-<p>The script <a href="/notes/scripts/globuscollectionput.py"><code class="language-plaintext highlighter-rouge">globuscollectionput.py</code></a> uses
-<a href="https://requests.readthedocs.io/en/latest/"><code class="language-plaintext highlighter-rouge">requests</code></a> to do a PUT
-over HTTPS to a Globus collection. To make that useful, it can act
-either as a <a href="https://globus-sdk-python.readthedocs.io/en/stable/examples/native_app.html">Native
+<p>The script
+<a href="https://github.com/rpwagner/serverless-data/blob/main/bin/globuscollectionput.py"><code class="language-plaintext highlighter-rouge">globuscollectionput.py</code></a> 
+uses <a href="https://requests.readthedocs.io/en/latest/"><code class="language-plaintext highlighter-rouge">requests</code></a> to do a
+PUT over HTTPS to a <a href="https://docs.globus.org/globus-connect-server/v5.4/https-access-collections/">Globus
+collection</a>. To
+make that useful, it can act either as a <a href="https://globus-sdk-python.readthedocs.io/en/stable/examples/native_app.html">Native
 App</a>
 or <a href="https://globus-sdk-python.readthedocs.io/en/stable/examples/client_credentials.html">Confidential
 Client</a>
-to get the necessary access tokens from <a href="https://docs.globus.org/api/auth/">Globus Auth</a>.</p>
+to get the necessary access tokens from <a href="https://docs.globus.org/globus-connect-server/v5.4/https-access-collections/#accessing_data">Globus
+Auth</a>.</p>
 
 <h2 id="why">
 <a class="anchor" href="#why" aria-hidden="true"><span class="octicon octicon-link"></span></a>Why?</h2>
@@ -160,7 +163,7 @@ will close their laptop and kill the upload.</p>
 SDK</a>, and <a href="https://github.com/fair-research/native-login">Fair Research
 Login </a> packages.</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python -m pip install click globus_sdk fair_research_login
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python <span class="nt">-m</span> pip <span class="nb">install </span>click globus_sdk fair_research_login
 </code></pre></div></div>
 
 <p>This main reason Fair Research Login is used is for the convenient
@@ -176,11 +179,11 @@ browser interaction when logging in.</p>
   <li>The UUID of the collection</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>globuscollectionput.py [OPTIONS] FILENAME DESTINATION COLLECTION_ID
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>globuscollectionput.py <span class="o">[</span>OPTIONS] FILENAME DESTINATION COLLECTION_ID
 </code></pre></div></div>
 
 <p>For example</p>
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./globuscollectionput.py science.json /data/ 6528bad5-bc02-497d-8a4f-a38547d0e72a
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./globuscollectionput.py science.json /data/ 6528bad5-bc02-497d-8a4f-a38547d0e72a
 </code></pre></div></div>
 <p>will try to PUT the file <code class="language-plaintext highlighter-rouge">science.json</code> into the folder <code class="language-plaintext highlighter-rouge">/data/</code> of
 the collection <code class="language-plaintext highlighter-rouge">6528bad5-bc02-497d-8a4f-a38547d0e72a</code>. In Globus CLI
@@ -194,7 +197,7 @@ syntax, the result would be a file at</p>
 
 <p>If the destination is a path (e.g, <code class="language-plaintext highlighter-rouge">/data</code>), it will be appended to
 the base URL of the collection to make the destination URL. The base
-URL will be found by calling <a href="https://globus-sdk-python.readthedocs.io/en/stable/services/transfer.html#globus_sdk.TransferClient.get_endpoint"><code class="language-plaintext highlighter-rouge">TransfeClient.get_endpoint</code></a>
+URL will be found by calling <a href="https://docs.globus.org/globus-connect-server/v5.4/https-access-collections/#using_the_python_sdk"><code class="language-plaintext highlighter-rouge">TransfeClient.get_endpoint</code></a>
 and checking the key <code class="language-plaintext highlighter-rouge">'https_server'</code></p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">collection_info</span> <span class="o">=</span> <span class="n">tc</span><span class="p">.</span><span class="n">get_endpoint</span><span class="p">(</span><span class="n">collection_id</span><span class="p">)</span>
 <span class="n">base_url</span> <span class="o">=</span> <span class="n">collection_info</span><span class="p">[</span><span class="s">'https_server'</span><span class="p">]</span>
@@ -325,15 +328,15 @@ either case, the client’s identity will be</p>
 
 <p>Where <code class="language-plaintext highlighter-rouge">&lt;client_id&gt;</code> is the UUID of the client.</p>
 
-<h2 id="great-what-about-get-delete-and-head">
-<a class="anchor" href="#great-what-about-get-delete-and-head" aria-hidden="true"><span class="octicon octicon-link"></span></a>Great, What About <code class="language-plaintext highlighter-rouge">GET</code>, <code class="language-plaintext highlighter-rouge">DELETE</code>, and <code class="language-plaintext highlighter-rouge">HEAD</code>?</h2>
+<h2 id="great-what-about-get-delete-options-and-head">
+<a class="anchor" href="#great-what-about-get-delete-options-and-head" aria-hidden="true"><span class="octicon octicon-link"></span></a>Great, What About <code class="language-plaintext highlighter-rouge">GET</code>, <code class="language-plaintext highlighter-rouge">DELETE</code>, <code class="language-plaintext highlighter-rouge">OPTIONS</code>, and <code class="language-plaintext highlighter-rouge">HEAD</code>?</h2>
 
 <p>This is intended to show HTTPS can be used with Globus collections,
 beyond the important but simple case of enabling public access. If
 people find it useful or there’s a project that needs it, adding the
 other methods is a possibility.</p>
 
-<p>And if it helps, this might make it’s way to PyPI.</p>
+<p>And if it helps, this might make its way to PyPI.</p>
 
 <p>Pull requests welcome.</p>
 
@@ -353,26 +356,26 @@ Usage: globuscollectionput.py [OPTIONS] FILENAME DESTINATION COLLECTION_ID
 
   COLLECTION_ID UUID of the Globus Collection
 
-  By default, this is a Native App, and will prompt the user
-  to login via Globus and then store their access and refresh
-  tokens for reuse. You may also provide the path to a JSON
-  file containign the client ID and secret of a Confidential
-  Client specified as 'client_id' and 'client_secret', e.g.,
+  By default, this is a Native App, and will prompt the user to login via
+  Globus and then store their access and refresh tokens for reuse. You may
+  also provide the path to a JSON file containing the client ID and secret
+  of a Confidential Client specified as 'client_id' and 'client_secret':
   
   {
      "client_id": "82d3a...",
      "client_secret": "QmUvb..."
   }
 
-  If DESTINATION is a path, it will be appended to the base URL
-  of the collection to make the destination URL.
+  Follow these instructions to create a Confidential Client:
+  https://docs.globus.org/api/auth/developer-guide/#register-app
 
-  If the destination ends with a slash, e.g. /foo/ or
-  https://example.edu/foo/,
+  If DESTINATION is a path, it will be appended to the base URL of the
+  collection to make the destination URL.
+
+  If the destination ends with a slash, e.g. /foo/ or https://example.edu/foo/
   the file will be uploaded with its base name, like
-  https://example.edu/foo/data.json
-  Otherwise, the DESTINATION will be the path of the file on the
-  collection after upload.
+  https://example.edu/foo/data.json. Otherwise, the DESTINATION will be the
+  path of the file on the collection after upload.
 
 Options:
   -n, --no-browser          Do not use the local server and do not try to open
@@ -380,9 +383,8 @@ Options:
                             SSH).
   -c, --client-config TEXT  Confidential Client configuration file.
   -v, --verbose             Print more information.
-  --help                    Show this message and exit.
+  --help                    Show this message and exit.```
 </code></pre></div></div>
-
 
   </div><a class="u-url" href="/notes/2022/09/16/globus-https-put.html" hidden></a>
 </article>
