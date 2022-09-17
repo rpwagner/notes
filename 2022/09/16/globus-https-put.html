@@ -1,0 +1,241 @@
+<h1 id="globus-https-put">Globus HTTPS <code class="language-plaintext highlighter-rouge">PUT</code></h1>
+
+<p>The script <a href="../scripts/globuscollectionput.py"><code class="language-plaintext highlighter-rouge">globuscollectionput.py</code></a> uses
+<a href="https://requests.readthedocs.io/en/latest/"><code class="language-plaintext highlighter-rouge">requests</code></a> to do a PUT
+over HTTPS to a Globus collection. To make that useful, it can act
+either as a <a href="https://globus-sdk-python.readthedocs.io/en/stable/examples/native_app.html">Native
+App</a>
+or <a href="https://globus-sdk-python.readthedocs.io/en/stable/examples/client_credentials.html">Confidential
+Client</a>
+to get the necessary access tokens from <a href="https://docs.globus.org/api/auth/">Globus Auth</a>.</p>
+
+<h2 id="why">Why?</h2>
+
+<p>Sometimes, it just isn’t possible to get a Globus endpoint working where you
+need it. And for sending the occassional modest-sized file, a Python
+script with minimal dependencies is more likely to “just work”.</p>
+
+<p>And not needing to register even a personal endpoint opens up some new
+use cases. For example, this could be used with a CI process to push build
+ artifacts to a collection. And keeping a client secret in the build
+ secrets is well supported.</p>
+
+<p>The caveat is that this doesn’t have the reliability mechanisms of
+Globus Transfer. At some point, a file will take too long, or someone
+will close their laptop and kill the upload.</p>
+
+<h2 id="dependencies">Dependencies</h2>
+
+<p>Outside of the Python standard library, you’ll need the
+<a href="https://click.palletsprojects.com/">Click</a>, <a href="https://globus-sdk-python.readthedocs.io/">Globus Python
+SDK</a>, and <a href="https://github.com/fair-research/native-login">Fair Research
+Login </a> packages.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python -m pip install click globus_sdk fair_research_login
+</code></pre></div></div>
+
+<p>This main reason Fair Research Login is used is for the convenient
+browser interaction when logging in.</p>
+
+<h2 id="basic-usage">Basic Usage</h2>
+
+<p><code class="language-plaintext highlighter-rouge">globuscollectionput.py</code> has three required positional arguments:</p>
+<ul>
+  <li>The name of the file to upload</li>
+  <li>The destination (a path or URL)</li>
+  <li>The UUID of the collection</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>globuscollectionput.py [OPTIONS] FILENAME DESTINATION COLLECTION_ID
+</code></pre></div></div>
+
+<p>For example</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./globuscollectionput.py science.json /data/ 6528bad5-bc02-497d-8a4f-a38547d0e72a
+</code></pre></div></div>
+<p>will try to PUT the file <code class="language-plaintext highlighter-rouge">science.json</code> into the folder <code class="language-plaintext highlighter-rouge">/data/</code> of
+the collection <code class="language-plaintext highlighter-rouge">6528bad5-bc02-497d-8a4f-a38547d0e72a</code>. In Globus CLI
+syntax, the result would be a file at</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>6528bad5-bc02-497d-8a4f-a38547d0e72a:/data/science.json
+</code></pre></div></div>
+
+<h2 id="destination-url-or-path">Destination: URL or Path</h2>
+
+<p>If the destination is a path (e.g, <code class="language-plaintext highlighter-rouge">/data</code>), it will be appended to
+the base URL of the collection to make the destination URL. The base
+URL will be found by calling <a href="https://globus-sdk-python.readthedocs.io/en/stable/services/transfer.html#globus_sdk.TransferClient.get_endpoint"><code class="language-plaintext highlighter-rouge">TransfeClient.get_endpoint</code></a>
+and checking the key <code class="language-plaintext highlighter-rouge">'https_server'</code></p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">collection_info</span> <span class="o">=</span> <span class="n">tc</span><span class="p">.</span><span class="n">get_endpoint</span><span class="p">(</span><span class="n">collection_id</span><span class="p">)</span>
+<span class="n">base_url</span> <span class="o">=</span> <span class="n">collection_info</span><span class="p">[</span><span class="s">'https_server'</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>In this case a slash <code class="language-plaintext highlighter-rouge">/</code> will be prepended to the path if needed.</p>
+
+<h2 id="destination-file-or-folder">Destination: File or Folder</h2>
+
+<p>The destination can be given as a file or folder. The script will
+check the end of the destination for a trailing slash to see which was
+provided. This allows for renaming files when they’re PUT.</p>
+
+<p>If the destination ends with a slash, e.g. <code class="language-plaintext highlighter-rouge">/data/</code> or
+  <code class="language-plaintext highlighter-rouge">https://example.edu/data/</code>, the file will be uploaded with its base
+  name, like <code class="language-plaintext highlighter-rouge">https://example.edu/data/science.json</code>. Otherwise, the
+  destination will be path the file on the collection after upload.</p>
+
+<p>Of course, this is about what the script tries to do. If the
+resource on the destination is a folder but is given as <code class="language-plaintext highlighter-rouge">/folder</code>,
+without the trailing slash, the PUT will fail.</p>
+
+<h2 id="destination-matrix">Destination Matrix</h2>
+
+<p>Suppose the collection has the base URL of <code class="language-plaintext highlighter-rouge">https://example.edu</code>, the
+top-level folder <code class="language-plaintext highlighter-rouge">/data/</code>, and a user wants to upload the file
+<code class="language-plaintext highlighter-rouge">science.json</code>. Here are the results from various inputs to destination:</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>Filename</td>
+      <td>Destination</td>
+      <td>Result</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">science.json</code></td>
+      <td><code class="language-plaintext highlighter-rouge">/data/</code></td>
+      <td>File at <code class="language-plaintext highlighter-rouge">https://example.edu/data/science.json</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">science.json</code></td>
+      <td><code class="language-plaintext highlighter-rouge">/data/isawesome.json</code></td>
+      <td>File at <code class="language-plaintext highlighter-rouge">https://example.edu/data/isawesome.json</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">science.json</code></td>
+      <td><code class="language-plaintext highlighter-rouge">data/</code></td>
+      <td>File at <code class="language-plaintext highlighter-rouge">https://example.edu/data/science.json</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">science.json</code></td>
+      <td><code class="language-plaintext highlighter-rouge">data/isawesome.json</code></td>
+      <td>File at <code class="language-plaintext highlighter-rouge">https://example.edu/data/isawesome.json</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">science.json</code></td>
+      <td><code class="language-plaintext highlighter-rouge">https://example.edu/data/</code></td>
+      <td>File at <code class="language-plaintext highlighter-rouge">https://example.edu/data/science.json</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">science.json</code></td>
+      <td><code class="language-plaintext highlighter-rouge">https://example.edu/data/isawesome.json</code></td>
+      <td>File at <code class="language-plaintext highlighter-rouge">https://example.edu/data/science.json</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">science.json</code></td>
+      <td><code class="language-plaintext highlighter-rouge">data</code></td>
+      <td>Failed.  Tried to PUT file where a folder exists.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">science.json</code></td>
+      <td><code class="language-plaintext highlighter-rouge">https://example.edu/data</code></td>
+      <td>Failed.  Tried to PUT file where a folder exists.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="authentication">Authentication</h2>
+
+<h3 id="native-app-default">Native App (Default)</h3>
+
+<p>By default, this is a Native App, and will prompt the user to login
+via Globus and then store their access and refresh  tokens for
+reuse. The tokens will be stored in the file
+<code class="language-plaintext highlighter-rouge">~/.globus-native-apps.cfg</code>. As you interact with different
+collections, the tokens for each will be add to the file. Removing
+this file is effectively logging out.</p>
+
+<p>When doing Native App authentication, the web-browser and local HTTP
+server flow can be disabled with the flags <code class="language-plaintext highlighter-rouge">-n</code> or <code class="language-plaintext highlighter-rouge">no-browser</code>. This is
+necessary when running it on remote systems (i.e., over SSH).</p>
+
+<h3 id="confidential-client">Confidential Client</h3>
+
+<p>The option <code class="language-plaintext highlighter-rouge">-c</code>, <code class="language-plaintext highlighter-rouge">--client-config</code>, accepts the name of a JSON file
+containing the  client ID and secret of a Confidential Client
+specified as <code class="language-plaintext highlighter-rouge">"client_id"</code> and <code class="language-plaintext highlighter-rouge">"client_secret"</code></p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+	</span><span class="nl">"client_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"82d3a..."</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"client_secret"</span><span class="p">:</span><span class="w"> </span><span class="s2">"QmUvb..."</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Follow <a href="https://docs.globus.org/api/auth/developer-guide/#register-app">these
+instructions</a>
+to register a Confidential Client on the <a href="https://developers.globus.org">Globus developer site</a></p>
+
+<p>The client will need permissions to access the collection. You can do
+this by <a href="https://docs.globus.org/globus-connect-server/v5/use-client-credentials/">mapping a client identity to a local
+account</a>
+or by giving the client access to a folder in a guest collection. In
+either case, the client’s identity will be</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;client_id&gt;@clients.auth.globus.org
+</code></pre></div></div>
+
+<p>Where <code class="language-plaintext highlighter-rouge">&lt;client_id&gt;</code> is the UUID of the client.</p>
+
+<h2 id="great-what-about-get-delete-and-head">Great, What About <code class="language-plaintext highlighter-rouge">GET</code>, <code class="language-plaintext highlighter-rouge">DELETE</code>, and <code class="language-plaintext highlighter-rouge">HEAD</code>?</h2>
+
+<p>This is intended to show HTTPS can be used with Globus collections,
+beyond the important but simple case of enabling public access. If
+people find it useful or there’s a project that needs it, adding the
+other methods is a possibility.</p>
+
+<p>And if it helps, this might make it’s way to PyPI.</p>
+
+<p>Pull requests welcome.</p>
+
+<h2 id="getting-help">Getting Help</h2>
+
+<p>Help is accessed using <code class="language-plaintext highlighter-rouge">--help</code>.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ./globuscollectionput.py --help
+Usage: globuscollectionput.py [OPTIONS] FILENAME DESTINATION COLLECTION_ID
+
+  Use HTTPS to PUT a file to a Globus Collection
+
+  FILENAME is the local file to be uploaded, data.json
+
+  DESTINATION path (/foo) or URL (https://example.org/foo)
+
+  COLLECTION_ID UUID of the Globus Collection
+
+  By default, this is a Native App, and will prompt the user
+  to login via Globus and then store their access and refresh
+  tokens for reuse. You may also provide the path to a JSON
+  file containign the client ID and secret of a Confidential
+  Client specified as 'client_id' and 'client_secret', e.g.,
+  
+  {
+     "client_id": "82d3a...",
+     "client_secret": "QmUvb..."
+  }
+
+  If DESTINATION is a path, it will be appended to the base URL
+  of the collection to make the destination URL.
+
+  If the destination ends with a slash, e.g. /foo/ or
+  https://example.edu/foo/,
+  the file will be uploaded with its base name, like
+  https://example.edu/foo/data.json
+  Otherwise, the DESTINATION will be the path of the file on the
+  collection after upload.
+
+Options:
+  -n, --no-browser          Do not use the local server and do not try to open
+                            browser. Use this when running remote (e.g., over
+                            SSH).
+  -c, --client-config TEXT  Confidential Client configuration file.
+  -v, --verbose             Print more information.
+  --help                    Show this message and exit.
+</code></pre></div></div>
+
