@@ -7,14 +7,17 @@
  
 # Globus HTTPS `PUT`
 
-The script [`globuscollectionput.py`](/notes/scripts/globuscollectionput.py) uses
-[`requests`](https://requests.readthedocs.io/en/latest/) to do a PUT
-over HTTPS to a Globus collection. To make that useful, it can act
-either as a [Native
+The script
+[`globuscollectionput.py`](https://github.com/rpwagner/serverless-data/blob/main/bin/globuscollectionput.py) 
+uses [`requests`](https://requests.readthedocs.io/en/latest/) to do a
+PUT over HTTPS to a [Globus
+collection](https://docs.globus.org/globus-connect-server/v5.4/https-access-collections/). To
+make that useful, it can act either as a [Native
 App](https://globus-sdk-python.readthedocs.io/en/stable/examples/native_app.html)
 or [Confidential
 Client](https://globus-sdk-python.readthedocs.io/en/stable/examples/client_credentials.html)
-to get the necessary access tokens from [Globus Auth](https://docs.globus.org/api/auth/).
+to get the necessary access tokens from [Globus
+Auth](https://docs.globus.org/globus-connect-server/v5.4/https-access-collections/#accessing_data).
 
 ## Why?
 
@@ -38,7 +41,7 @@ Outside of the Python standard library, you'll need the
 SDK](https://globus-sdk-python.readthedocs.io/), and [Fair Research
 Login ](https://github.com/fair-research/native-login) packages.
 
-```
+```shell
 python -m pip install click globus_sdk fair_research_login
 ```
 
@@ -52,12 +55,12 @@ browser interaction when logging in.
 - The destination (a path or URL)
 - The UUID of the collection
 
-```
+```shell
 globuscollectionput.py [OPTIONS] FILENAME DESTINATION COLLECTION_ID
 ```
 
 For example
-```bash
+```shell
 ./globuscollectionput.py science.json /data/ 6528bad5-bc02-497d-8a4f-a38547d0e72a
 ```
 will try to PUT the file `science.json` into the folder `/data/` of
@@ -72,7 +75,7 @@ syntax, the result would be a file at
 
 If the destination is a path (e.g, `/data`), it will be appended to
 the base URL of the collection to make the destination URL. The base
-URL will be found by calling [`TransfeClient.get_endpoint`](https://globus-sdk-python.readthedocs.io/en/stable/services/transfer.html#globus_sdk.TransferClient.get_endpoint)
+URL will be found by calling [`TransfeClient.get_endpoint`](https://docs.globus.org/globus-connect-server/v5.4/https-access-collections/#using_the_python_sdk)
 and checking the key `'https_server'`
 ```python
 collection_info = tc.get_endpoint(collection_id)
@@ -155,14 +158,14 @@ either case, the client's identity will be
 
 Where `<client_id>` is the UUID of the client.
 
-## Great, What About `GET`, `DELETE`, and `HEAD`?
+## Great, What About `GET`, `DELETE`, `OPTIONS`, and `HEAD`?
 
 This is intended to show HTTPS can be used with Globus collections,
 beyond the important but simple case of enabling public access. If
 people find it useful or there's a project that needs it, adding the
 other methods is a possibility.
 
-And if it helps, this might make it's way to PyPI.
+And if it helps, this might make its way to PyPI.
 
 Pull requests welcome.
 
@@ -182,26 +185,26 @@ Usage: globuscollectionput.py [OPTIONS] FILENAME DESTINATION COLLECTION_ID
 
   COLLECTION_ID UUID of the Globus Collection
 
-  By default, this is a Native App, and will prompt the user
-  to login via Globus and then store their access and refresh
-  tokens for reuse. You may also provide the path to a JSON
-  file containign the client ID and secret of a Confidential
-  Client specified as 'client_id' and 'client_secret', e.g.,
+  By default, this is a Native App, and will prompt the user to login via
+  Globus and then store their access and refresh tokens for reuse. You may
+  also provide the path to a JSON file containing the client ID and secret
+  of a Confidential Client specified as 'client_id' and 'client_secret':
   
   {
      "client_id": "82d3a...",
      "client_secret": "QmUvb..."
   }
 
-  If DESTINATION is a path, it will be appended to the base URL
-  of the collection to make the destination URL.
+  Follow these instructions to create a Confidential Client:
+  https://docs.globus.org/api/auth/developer-guide/#register-app
 
-  If the destination ends with a slash, e.g. /foo/ or
-  https://example.edu/foo/,
+  If DESTINATION is a path, it will be appended to the base URL of the
+  collection to make the destination URL.
+
+  If the destination ends with a slash, e.g. /foo/ or https://example.edu/foo/
   the file will be uploaded with its base name, like
-  https://example.edu/foo/data.json
-  Otherwise, the DESTINATION will be the path of the file on the
-  collection after upload.
+  https://example.edu/foo/data.json. Otherwise, the DESTINATION will be the
+  path of the file on the collection after upload.
 
 Options:
   -n, --no-browser          Do not use the local server and do not try to open
@@ -209,6 +212,5 @@ Options:
                             SSH).
   -c, --client-config TEXT  Confidential Client configuration file.
   -v, --verbose             Print more information.
-  --help                    Show this message and exit.
+  --help                    Show this message and exit.```
 ```
-
