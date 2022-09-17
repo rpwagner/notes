@@ -2,13 +2,12 @@
  toc: true
  layout: post
  description: A script to do HTTPS uploads to a Globus collection.
- categories: [globus, script, python]
  title: Globus HTTPS PUT
 ---
  
 # Globus HTTPS `PUT`
 
-The script [`globuscollectionput.py`](../scripts/globuscollectionput.py) uses
+The script [`globuscollectionput.py`](/notes/scripts/globuscollectionput.py) uses
 [`requests`](https://requests.readthedocs.io/en/latest/) to do a PUT
 over HTTPS to a Globus collection. To make that useful, it can act
 either as a [Native
