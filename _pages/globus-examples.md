@@ -73,7 +73,7 @@ community-managed space for contributions.
 
 ## Thanks
 
-Finally, thanks to the Globus on everything that makes these possible.
+Finally, thanks to the Globus team for everything that makes these possible.
 
 ## List of Examples
 
